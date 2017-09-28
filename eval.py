@@ -44,12 +44,14 @@ def run_eval(ckpt_dir):
     path = '%s-%03d.wav' % (base_path, i)
     print('Synthesizing: %s' % path)
     with open(path, 'wb') as f:
-      f.write(synth.synthesize(text))
+      f.write(synth.synthesize(text, args.speaker))
 
 
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--checkpoint', default='logs-tacotron', help='Path to model checkpoint')
+  #parser.add_argument('--checkpoint', required=True, help='Path to model checkpoint')
+  parser.add_argument('--speaker', type=int, default=374, help='Speaker ID')
   parser.add_argument('--hparams', default='',
     help='Hyperparameter overrides as a comma-separated list of name=value pairs')
   args = parser.parse_args()

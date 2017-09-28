@@ -15,7 +15,7 @@ class Tacotron():
     self._hparams = hparams
 
 
-  def initialize(self, inputs, input_lengths, mel_targets=None, linear_targets=None, stop_token_targets=None, global_step=None):
+  def initialize(self, inputs, input_lengths, speaker_ids, mel_targets=None, linear_targets=None, stop_token_targets=None, global_step=None):
     '''Initializes the model for inference.
 
     Sets "mel_outputs", "linear_outputs", and "alignments" fields.
@@ -43,9 +43,30 @@ class Tacotron():
         initializer=tf.truncated_normal_initializer(stddev=0.5))
       embedded_inputs = tf.nn.embedding_lookup(embedding_table, inputs)                            # [N, T_in, embed_depth=256]
 
+      # Speaker Embeddings
+      speaker_embedding_table = tf.get_variable(
+        'speaker_embedding', [377, 256], dtype=tf.float32,
+        initializer=tf.truncated_normal_initializer(stddev=0.5))
+      tiled_speaker_id = tf.tile(tf.expand_dims(speaker_ids, axis=1), [1, tf.shape(inputs)[1]])
+      embedded_speakers = tf.nn.embedding_lookup(
+        speaker_embedding_table, tiled_speaker_id)                                # [N, T_in, 256]
+      embedded = tf.concat([embedded_inputs, embedded_speakers], axis=-1)         # [N, T_in, 512]
+
       # Encoder
-      prenet_outputs = prenet(embedded_inputs, is_training, hp.prenet_depths)                      # [N, T_in, prenet_depths[-1]=128]
+#<<<<<<< HEAD
+      prenet_outputs = prenet(embedded, is_training, hp.prenet_depths)                      # [N, T_in, prenet_depths[-1]=128]
       encoder_outputs = encoder_cbhg(prenet_outputs, input_lengths, is_training, hp.encoder_depth) # [N, T_in, encoder_depth=256]
+#=======
+      #prenet_outputs = prenet(embedded, is_training)                              # [N, T_in, 128]
+      #encoder_outputs = encoder_cbhg(prenet_outputs, input_lengths, is_training)  # [N, T_in, 256]
+
+      ## Attention
+      #attention_cell = AttentionWrapper(
+        #DecoderPrenetWrapper(GRUCell(256), is_training),
+        #BahdanauAttention(256, encoder_outputs),
+        #alignment_history=True,
+        #output_attention=False)                                                  # [N, T_in, 256]
+#>>>>>>> WIP: multispeaker support
 
       # Location sensitive attention
       attention_mechanism = LocationSensitiveAttention(hp.attention_depth, encoder_outputs)        # [N, T_in, attention_depth=256]
@@ -90,6 +111,7 @@ class Tacotron():
 
       self.inputs = inputs
       self.input_lengths = input_lengths
+      self.speaker_ids = speaker_ids
       self.mel_outputs = mel_outputs
       self.linear_outputs = linear_outputs
       self.stop_token_outputs = stop_token_outputs
@@ -98,6 +120,7 @@ class Tacotron():
       self.linear_targets = linear_targets
       self.stop_token_targets = stop_token_targets
       log('Initialized Tacotron model. Dimensions: ')
+#<<<<<<< HEAD
       log('  embedding:               {}'.format(embedded_inputs.shape))
       log('  prenet out:              {}'.format(prenet_outputs.shape))
       log('  encoder out:             {}'.format(encoder_outputs.shape))
@@ -106,6 +129,18 @@ class Tacotron():
       log('  postnet out:             {}'.format(post_outputs.shape))
       log('  linear out:              {}'.format(linear_outputs.shape))
       log('  stop token:              {}'.format(stop_token_outputs.shape))
+#=======
+      #log('  embedding:               %d' % embedded.shape[-1])
+      #log('  prenet out:              %d' % prenet_outputs.shape[-1])
+      #log('  encoder out:             %d' % encoder_outputs.shape[-1])
+      #log('  attention out:           %d' % attention_cell.output_size)
+      #log('  concat attn & out:       %d' % concat_cell.output_size)
+      #log('  decoder cell out:        %d' % decoder_cell.output_size)
+      #log('  decoder out (%d frames):  %d' % (hp.outputs_per_step, decoder_outputs.shape[-1]))
+      #log('  decoder out (1 frame):   %d' % mel_outputs.shape[-1])
+      #log('  postnet out:             %d' % post_outputs.shape[-1])
+      #log('  linear out:              %d' % linear_outputs.shape[-1])
+#>>>>>>> WIP: multispeaker support
 
 
   def add_loss(self):
