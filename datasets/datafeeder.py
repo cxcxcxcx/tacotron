@@ -94,7 +94,7 @@ class DataFeeder(threading.Thread):
     examples = [self._get_next_example() for i in range(n * _batches_per_group)]
 
     # Bucket examples based on similar output sequence length for efficiency:
-    examples.sort(key=lambda x: x[3])
+    examples.sort(key=lambda x: x[4])
     batches = [examples[i:i+n] for i in range(0, len(examples), n)]
     random.shuffle(batches)
 
@@ -136,7 +136,7 @@ def _prepare_batch(batch, outputs_per_step):
   mel_targets = _prepare_targets([x[1] for x in batch], outputs_per_step)
   linear_targets = _prepare_targets([x[2] for x in batch], outputs_per_step)
   stop_token_targets = _prepare_stop_token_targets([x[3] for x in batch], outputs_per_step)
-  speaker_ids = np.asarray([x[4] for x in batch], dtype=np.int32)
+  speaker_ids = np.asarray([x[5] for x in batch], dtype=np.int32)
   return (inputs, input_lengths, speaker_ids, mel_targets, linear_targets, stop_token_targets)
 
 

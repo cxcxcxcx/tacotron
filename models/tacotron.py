@@ -45,12 +45,23 @@ class Tacotron():
 
       # Speaker Embeddings
       speaker_embedding_table = tf.get_variable(
-        'speaker_embedding', [377, 256], dtype=tf.float32,
+        'speaker_embedding', [60, 128], dtype=tf.float32,
         initializer=tf.truncated_normal_initializer(stddev=0.5))
-      tiled_speaker_id = tf.tile(tf.expand_dims(speaker_ids, axis=1), [1, tf.shape(inputs)[1]])
+
       embedded_speakers = tf.nn.embedding_lookup(
-        speaker_embedding_table, tiled_speaker_id)                                # [N, T_in, 256]
-      embedded = tf.concat([embedded_inputs, embedded_speakers], axis=-1)         # [N, T_in, 512]
+        speaker_embedding_table, speaker_ids)                                # [N, 256]
+      embedded_speakers = tf.tile(
+        tf.expand_dims(embedded_speakers, axis=1),
+        [1, tf.shape(inputs)[1], 1]) # [N, T_in, 256]
+
+
+      #tiled_speaker_id = tf.tile(tf.expand_dims(speaker_ids, axis=1), [1, tf.shape(inputs)[1]])
+      #embedded_speakers = tf.nn.embedding_lookup(
+        #speaker_embedding_table, tiled_speaker_id)                                # [N, T_in, 256]
+      if hp.speaker_embedding_to == 'input_embedding':
+          embedded = tf.concat([embedded_inputs, embedded_speakers], axis=-1)         # [N, T_in, 512]
+      else:
+          embedded = embedded_inputs
 
       # Encoder
 #<<<<<<< HEAD
@@ -69,6 +80,8 @@ class Tacotron():
 #>>>>>>> WIP: multispeaker support
 
       # Location sensitive attention
+      if hp.speaker_embedding_to == 'encoder_outputs':
+        encoder_outputs = tf.concat([encoder_outputs, embedded_speakers], axis=-1)
       attention_mechanism = LocationSensitiveAttention(hp.attention_depth, encoder_outputs)        # [N, T_in, attention_depth=256]
 
       # Decoder (layers specified bottom to top):

@@ -2,6 +2,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import numpy as np
 import os
+import re
 import glob
 from util import audio
 from hparams import hparams as hp
@@ -26,19 +27,25 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
   futures = []
   index = 1
 
-  trn_files = glob.glob(os.path.join(in_dir, 'biaobei_48000', '*.trn'))
+  trn_files = glob.glob(os.path.join(in_dir, 'data', '*.trn'))
+  print(trn_files)
+  speaker_set = set()
+  for f in trn_files:
+      speaker_set.add(re.search('/([A-D]\d+)_', f).group(1))
+  speakers = {speaker: i for i, speaker in enumerate(sorted(speaker_set))}
 
   for trn in trn_files:
-    with open(trn) as f:
+    with open(trn, encoding='utf-8') as f:
+      unused_text = f.readline()
       pinyin = f.readline().strip('\n')
-      wav_file = trn[:-4] + '.wav'
-      task = partial(_process_utterance, out_dir, index, wav_file, pinyin)
+      wav_file = trn[:-4]
+      task = partial(_process_utterance, out_dir, index, wav_file, pinyin, speakers)
       futures.append(executor.submit(task))
       index += 1
   return [future.result() for future in tqdm(futures) if future.result() is not None]
 
 
-def _process_utterance(out_dir, index, wav_path, pinyin):
+def _process_utterance(out_dir, index, wav_path, pinyin, speakers):
   '''Preprocesses a single utterance audio/text pair.
 
   This writes the mel and linear scale spectrograms to disk and returns a tuple to write
@@ -54,6 +61,8 @@ def _process_utterance(out_dir, index, wav_path, pinyin):
     A (spectrogram_filename, mel_filename, n_frames, text) tuple to write to train.txt
   '''
 
+  speaker = re.search(r'/([A-E]\d+)_', wav_path).group(1)
+  speaker_id = speakers[speaker]
   # Load the audio to a numpy array:
   wav = audio.load_wav(wav_path)
 
@@ -79,4 +88,4 @@ def _process_utterance(out_dir, index, wav_path, pinyin):
   np.save(os.path.join(out_dir, mel_filename), mel_spectrogram.T, allow_pickle=False)
 
   # Return a tuple describing this training example:
-  return (spectrogram_filename, mel_filename, n_frames, pinyin)
+  return (spectrogram_filename, mel_filename, n_frames, pinyin, speaker_id)
