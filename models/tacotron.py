@@ -45,7 +45,7 @@ class Tacotron():
 
       # Speaker Embeddings
       speaker_embedding_table = tf.get_variable(
-        'speaker_embedding', [60, 128], dtype=tf.float32,
+        'speaker_embedding', [61, 256], dtype=tf.float32,
         initializer=tf.truncated_normal_initializer(stddev=0.5))
 
       embedded_speakers = tf.nn.embedding_lookup(

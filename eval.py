@@ -34,7 +34,7 @@ def get_output_base_path(checkpoint_path):
   return os.path.join(base_dir, name)
 
 
-def run_eval(ckpt_dir):
+def run_eval(ckpt_dir, args):
   checkpoint = tf.train.get_checkpoint_state(ckpt_dir).model_checkpoint_path
   print(hparams_debug_string())
   synth = Synthesizer()
@@ -51,14 +51,14 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--checkpoint', default='logs-tacotron', help='Path to model checkpoint')
   #parser.add_argument('--checkpoint', required=True, help='Path to model checkpoint')
-  parser.add_argument('--speaker', type=int, default=374, help='Speaker ID')
+  parser.add_argument('--speaker', type=int, default=34, help='Speaker ID')
   parser.add_argument('--hparams', default='',
     help='Hyperparameter overrides as a comma-separated list of name=value pairs')
   args = parser.parse_args()
   os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
   os.environ['CUDA_VISIBLE_DEVICES'] = '0'
   hparams.parse(args.hparams)
-  run_eval(args.checkpoint)
+  run_eval(args.checkpoint, args)
 
 
 if __name__ == '__main__':

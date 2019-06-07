@@ -35,6 +35,7 @@ def preprocess_biaobei(args):
   out_dir = os.path.join(args.base_dir, args.output)
   os.makedirs(out_dir, exist_ok=True)
   metadata = biaobei.build_from_path(in_dir, out_dir, args.num_workers, tqdm=tqdm)
+  write_metadata(metadata, out_dir)
 
 def preprocess_vctk(args):
   in_dir = os.path.join(args.base_dir, 'VCTK-Corpus')

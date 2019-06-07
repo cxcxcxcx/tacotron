@@ -83,13 +83,13 @@ def _process_utterance(out_dir, index, wav_path, pinyin):
     return None
 
   # Compute a mel-scale spectrogram from the wav:
-  mel_spectrogram = audio.melspectrogram(wav).astype(np.float32)
+#  mel_spectrogram = audio.melspectrogram(wav).astype(np.float32)
 
   # Write the spectrograms to disk:
   spectrogram_filename = 'biaobei-spec-%05d.npy' % index
   mel_filename = 'biaobei-mel-%05d.npy' % index
-  np.save(os.path.join(out_dir, spectrogram_filename), spectrogram.T, allow_pickle=False)
-  np.save(os.path.join(out_dir, mel_filename), mel_spectrogram.T, allow_pickle=False)
+#  np.save(os.path.join(out_dir, spectrogram_filename), spectrogram.T, allow_pickle=False)
+#  np.save(os.path.join(out_dir, mel_filename), mel_spectrogram.T, allow_pickle=False)
 
   # Return a tuple describing this training example:
-  return (spectrogram_filename, mel_filename, n_frames, pinyin)
+  return (spectrogram_filename, mel_filename, n_frames, pinyin, 60)
