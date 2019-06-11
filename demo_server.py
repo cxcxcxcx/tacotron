@@ -19,6 +19,7 @@ button[disabled] {opacity: 0.4; cursor: default}
 </style>
 <body>
 <form>
+  <input id="speaker_id" type="text" size="40" placeholder="speaker id">
   <input id="text" type="text" size="40" placeholder="Enter Text">
   <button id="button" name="synthesize">Speak</button>
 </form>
@@ -33,13 +34,13 @@ q('#button').addEventListener('click', function(e) {
     q('#message').textContent = 'Synthesizing...'
     q('#button').disabled = true
     q('#audio').hidden = true
-    synthesize(text)
+    synthesize(text, q('#speaker_id').value)
   }
   e.preventDefault()
   return false
 })
-function synthesize(text) {
-  fetch('/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
+function synthesize(text, speaker_id) {
+  fetch('/synthesize?text=' + encodeURIComponent(text) + '&speaker_id=' + speaker_id, {cache: 'no-cache'})
     .then(function(res) {
       if (!res.ok) throw Error(res.statusText)
       return res.blob()

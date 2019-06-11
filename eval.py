@@ -20,6 +20,7 @@ from synthesizer import Synthesizer
 # ]
 
 sentences = [
+  'qing1 qing1 de5 wo3 zou3 le5 , zheng4 ru2 wo3 qing1 qing1 de5 lai2 .',
   'ta1 jing3 ti4 de5 xia4 le5 chuang2 gei3 liang3 ge5 sun1 zi5 ye4 hao3 bei4 zi5 you4 na2 guo4 yi1 ba3 da4 yi3 zi5 ba3 jie3 mei4 lia3 dang3 zhu4 gang1 zou3 dao4 ke4 ting1 jiu4 bei4 ren2 lan2 yao1 bao4 zhu4 le5',
   'wei1 xin4 zhi1 fu4 zhang1 xiao3 long2 han3 jian4 lou4 mian4 cheng1 wei1 xin4 bu4 hui4 cha2 kan4 yong4 hu4 liao2 tian1 ji4 lu4 yi4 si an4 feng4 zhi1 fu4 bao3 , ben3 wen2 lai2 zi4 teng2 xun4 ke1 ji4 .',
   'da4 hui4 zhi3 re4 nao5 tou2 liang3 tian1 yue4 hou4 yue4 song1 kua3 zui4 zhong1 chu1 ben3 lun4 wen2 ji2 jiu4 suan4 yuan2 man3 wan2 cheng2 ren4 wu5',
